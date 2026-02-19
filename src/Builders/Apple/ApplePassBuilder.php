@@ -208,21 +208,22 @@ abstract class ApplePassBuilder
         foreach ($this->images as $filename => $image) {
             // The $image Image entity could contain up to three
             // images in different resolutions.
-
             if (! $image instanceof Image) {
                 $image = Image::make($image['x1Path'], $image['x2Path'], $image['x3Path']);
             }
 
+            $addFileMethod = $image->isRemote ? 'addRemoteFile' : 'addFile';
+
             if ($image->x1Path) {
-                $pkPass->addFile($image->x1Path, "$filename.png");
+                $pkPass->{$addFileMethod}($image->x1Path, "$filename.png");
             }
 
             if ($image->x2Path) {
-                $pkPass->addFile($image->x2Path, "$filename@2x.png");
+                $pkPass->{$addFileMethod}($image->x2Path, "$filename@2x.png");
             }
 
             if ($image->x3Path) {
-                $pkPass->addFile($image->x3Path, "$filename@3x.png");
+                $pkPass->{$addFileMethod}($image->x3Path, "$filename@3x.png");
             }
         }
 
