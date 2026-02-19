@@ -209,7 +209,7 @@ abstract class ApplePassBuilder
             // The $image Image entity could contain up to three
             // images in different resolutions.
             if (! $image instanceof Image) {
-                $image = Image::make($image['x1Path'], $image['x2Path'], $image['x3Path']);
+                $image = Image::fromArray($image);
             }
 
             $addFileMethod = $image->isRemote ? 'addRemoteFile' : 'addFile';
