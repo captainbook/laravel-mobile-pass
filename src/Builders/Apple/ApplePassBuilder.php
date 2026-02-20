@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use PKPass\PKPass;
+use Spatie\LaravelMobilePass\Builders\Apple\Entities\Barcode;
 use Spatie\LaravelMobilePass\Builders\Apple\Entities\Colour;
 use Spatie\LaravelMobilePass\Builders\Apple\Entities\FieldContent;
 use Spatie\LaravelMobilePass\Builders\Apple\Entities\Image;
@@ -55,6 +56,8 @@ abstract class ApplePassBuilder
     protected ?Collection $backFields = null;
 
     protected array $images = [];
+
+    protected ?Barcode $barcode = null;
 
     protected ?string $downloadName = null;
 
@@ -107,6 +110,28 @@ abstract class ApplePassBuilder
         return $this;
     }
 
+    /**
+     * Set the strip (banner) image. Displayed as a wide image across the pass.
+     * Recommended size: 375×123 pt (750×246 px @2x, 1125×369 px @3x).
+     */
+    public function setStripImage(Image $image): self
+    {
+        $this->images['strip'] = $image;
+
+        return $this;
+    }
+
+    /**
+     * Set the thumbnail image. On generic passes, shown on the right side of the header.
+     * Recommended size: 90×90 pt (180×180 px @2x, 270×270 px @3x) or 3:4 aspect.
+     */
+    public function setThumbnailImage(Image $image): self
+    {
+        $this->images['thumbnail'] = $image;
+
+        return $this;
+    }
+
     public function setPrimaryFields(FieldContent ...$primaryField): self
     {
         $this->primaryFields = collect($primaryField);
@@ -138,6 +163,13 @@ abstract class ApplePassBuilder
     public function setBackFields(FieldContent ...$backField): self
     {
         $this->backFields = collect($backField);
+
+        return $this;
+    }
+
+    public function setBarcode(Barcode $barcode): self
+    {
+        $this->barcode = $barcode;
 
         return $this;
     }
@@ -331,9 +363,10 @@ abstract class ApplePassBuilder
             'organizationName' => $this->organisationName,
             'passTypeIdentifier' => config('mobile-pass.apple.type_identifier'),
             'serialNumber' => $this->serialNumber,
-            'authenticationToken' => config('mobile-pass.webservice_secret'),
+            'authenticationToken' => config('mobile-pass.apple.webservice.secret'),
             'teamIdentifier' => config('mobile-pass.apple.team_identifier'),
             'description' => $this->description,
+            'barcode' => $this->barcode?->toArray(),
             'semantics' => $this->compileSemantics(),
             'userInfo' => [
                 'passType' => $this->type->value,
@@ -361,8 +394,7 @@ abstract class ApplePassBuilder
         $this->labelColour = Colour::makeFromRgbString($this->data['labelColor'] ?? null);
 
         $this->uncompileSemantics();
-        // $model->passImages = array_map(fn ($image) => Image::fromArray($image), $model->images);
-        // $model->barcodes = array_map(fn ($barcode) => Barcode::fromArray($barcode), $model->content['barcodes'] ?? []);
+        $this->barcode = ! empty($this->data['barcode']) ? Barcode::fromArray($this->data['barcode']) : null;
 
         $this->uncompileFieldSet('headerFields');
         $this->uncompileFieldSet('primaryFields');
