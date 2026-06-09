@@ -2,6 +2,24 @@
 
 All notable changes to `laravel-mobile-pass` will be documented in this file.
 
+## 1.2.1 - 2026-05-25
+
+### What's Changed
+
+- Respect the configured `mobile_pass` model in the Apple pass builder and the check-for-updates request, so overriding `mobile-pass.models.mobile_pass` (e.g. to use a custom table) is honored throughout the package by @freekmurze in https://github.com/spatie/laravel-mobile-pass/pull/43
+
+Fixes #42
+
+**Full Changelog**: https://github.com/spatie/laravel-mobile-pass/compare/1.2.0...1.2.1
+
+## 1.2.0 - 2026-05-11
+
+### What's Changed
+
+* Switch Google callback verification to ECv2SigningOnly. by @pmartelletti in https://github.com/spatie/laravel-mobile-pass/pull/41
+
+**Full Changelog**: https://github.com/spatie/laravel-mobile-pass/compare/1.1.0...1.2.0
+
 ## 1.1.0 - 2026-05-05
 
 ### What's Changed
